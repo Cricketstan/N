@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Allrounder - Highlights</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #000; font-family: Arial, sans-serif; color: #fff; }
+
+    header {
+      position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+      background: rgba(0,0,0,1); display: flex; align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.5);
+      z-index: 1000;
+    }
+    .logo img { height: 100%; width: auto; display: block; }
+
+    .section { margin-top: 70px; padding-left: 10px; }
+    .section h2 { margin-bottom: 10px; font-size: 20px; font-weight: 600; }
+
+    .scroll-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 12px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 10px;
+    }
+    .scroll-container::-webkit-scrollbar { display: none; }
+
+    .highlight-card {
+      position: relative;
+      flex: 0 0 80%;
+      max-width: 80%;
+      aspect-ratio: 16/9;
+      border-radius: 12px;
+      overflow: hidden;
+      background: #222;
+      cursor: pointer;
+      scroll-snap-align: start;
+    }
+    .highlight-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .gradient {
+      position: absolute; bottom: 0; left: 0; width: 100%; height: 40%;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    }
+    .highlight-title {
+      position: absolute; bottom: 8px; left: 10px; right: 10px;
+      font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.8);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <img src="https://allrounderlive.pages.dev/logo.png" alt="Logo">
+    </div>
+  </header>
+
+  <div class="section">
+    <h2>Highlights</h2>
+    <div class="scroll-container" id="highlightContainer"></div>
+  </div>
+
+  <script>
+    async function loadHighlights() {
+      const url = "https://cy-8i38.onrender.com/raw?url=" +
+        encodeURIComponent("https://acc-matchcentre.s3-ap-south-1.amazonaws.com/cpanel/client_14/2025/mediadoc/videos/1/videos.js?v=1756540254");
+
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        const json = JSON.parse(text.replace(/^onVideos\(/, "").replace(/\);$/, ""));
+        const container = document.getElementById("highlightContainer");
+
+        json.videos.forEach(video => {
+          const card = document.createElement("div");
+          card.className = "highlight-card";
+          card.innerHTML = `
+            <img src="${video.Image}" alt="${video.Title}">
+            <div class="gradient"></div>
+            <div class="highlight-title">${video.Title}</div>
+          `;
+          card.addEventListener("click", () => {
+            window.location.href =
+              "player.html?src=" + encodeURIComponent(video.MediaData.videos) +
+              "&title=" + encodeURIComponent(video.Title);
+          });
+          container.appendChild(card);
+        });
+      } catch (e) {
+        console.error("Error loading highlights:", e);
+      }
+    }
+
+    loadHighlights();
+  </script>
+</body>
+</html>
